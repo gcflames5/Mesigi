@@ -10,6 +10,8 @@ public class AuthenticationRequestPacket extends Packet {
 
     private String secret;
 
+    public AuthenticationRequestPacket() {}
+
     public AuthenticationRequestPacket(String secret){
         this.secret = secret;
     }

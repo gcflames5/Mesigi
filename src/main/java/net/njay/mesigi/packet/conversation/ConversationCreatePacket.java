@@ -12,6 +12,13 @@ public class ConversationCreatePacket extends Packet{
     private String conversationId;
     private Conversation conversation;
 
+    public ConversationCreatePacket() {}
+
+    public ConversationCreatePacket(String conversationId, Conversation conversation){
+        this.conversationId = conversationId;
+        this.conversation = conversation;
+    }
+
     @Override
     public void readPacketContent(DataInputStream input) throws IOException {
         conversationId = Packet.readString(input);

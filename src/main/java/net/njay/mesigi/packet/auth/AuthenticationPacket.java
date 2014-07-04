@@ -12,6 +12,8 @@ public class AuthenticationPacket extends Packet {
     private String username;
     private String sessionID;
 
+    public AuthenticationPacket() {}
+
     public AuthenticationPacket(String username, String sessionID){
         this.username = username;
         this.sessionID = sessionID;
