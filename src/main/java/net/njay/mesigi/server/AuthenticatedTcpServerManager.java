@@ -1,7 +1,7 @@
 package net.njay.mesigi.server;
 
 import net.njay.customevents.event.Event;
-import net.njay.mesigi.server.listener.AuthenticationListener;
+import net.njay.mesigi.server.listener.auth.AuthenticationListener;
 import net.njay.serverinterconnect.connection.TcpConnection;
 import net.njay.serverinterconnect.server.TcpServerManager;
 

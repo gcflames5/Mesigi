@@ -5,6 +5,8 @@ import net.njay.mesigi.client.auth.Credentials;
 import net.njay.mesigi.client.listener.AuthenticationListener;
 import net.njay.mesigi.client.user.User;
 import net.njay.mesigi.packet.auth.AuthenticationSecretPacket;
+import net.njay.mesigi.util.log.LogLevel;
+import net.njay.mesigi.util.log.ReflectionLogger;
 import net.njay.serverinterconnect.client.TcpClientManager;
 import net.njay.serverinterconnect.packet.Packet;
 

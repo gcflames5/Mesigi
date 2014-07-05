@@ -1,4 +1,4 @@
-package net.njay.mesigi.server.listener;
+package net.njay.mesigi.server.listener.auth;
 
 import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
