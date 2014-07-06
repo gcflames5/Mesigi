@@ -1,6 +1,7 @@
 package net.njay.mesigi;
 
 import net.njay.customevents.event.Event;
+import net.njay.customevents.event.EventHandler;
 import net.njay.customevents.event.Listener;
 import net.njay.mesigi.client.Client;
 import net.njay.mesigi.client.auth.Credentials;
@@ -17,6 +18,11 @@ import net.njay.mesigi.server.Server;
 import net.njay.mesigi.util.cmd.CmdUtil;
 import net.njay.mesigi.util.log.LogLevel;
 import net.njay.mesigi.util.log.ReflectionLogger;
+import net.njay.mesigi.util.upnp.Upnp;
+import net.njay.mesigi.util.upnp.UpnpManager;
+import net.njay.mesigi.util.upnp.exception.CleanPortNotFoundException;
+import net.njay.mesigi.util.upnp.exception.GatewayNotFoundException;
+import net.njay.serverinterconnect.event.PacketRecievedEvent;
 import net.njay.serverinterconnect.packet.Packet;
 
 import java.io.IOException;
@@ -28,10 +34,24 @@ import java.util.ArrayList;
 public class Mesigi implements Listener {
 
     public static void main(String args[]) {
+        hookCleanupThread();
         try{
             Event.addListener(new Mesigi());
-            registerPackets();
-            ReflectionLogger.filter(LogLevel.SEVERE, ReflectionLogger.FilterMode.WHITELIST, Mesigi.class);
+            for (Listener l : Event.getListeners())
+                ReflectionLogger.log(LogLevel.INFO, l.getClass().toString());
+            registerPackets(MessageSendPacket.class, AuthenticationPacket.class, AuthenticationRequestPacket.class, AuthenticationSecretPacket.class, ConversationCreatePacket.class,
+                    ConversationCreatePacket.class, UserStateChangePacket.class);
+            //ReflectionLogger.filter(LogLevel.INFO, ReflectionLogger.FilterMode.WHITELIST, Mesigi.class);
+
+            int portForward = CmdUtil.getIntAttribute(args, "-pf", "-upnp");
+            try{
+                Upnp.forward(portForward, portForward);
+            }catch(GatewayNotFoundException e){
+                ReflectionLogger.log(LogLevel.WARNING, "No valid Upnp Gateway found!");
+            }catch(CleanPortNotFoundException e){
+                ReflectionLogger.log(LogLevel.WARNING,  "Failed to find clean port!");
+            }
+
             String mode = CmdUtil.getStringAttribute(args, "-m", "-mode");
             if (mode.contains("s"))
                 startServer(args);
@@ -39,9 +59,15 @@ public class Mesigi implements Listener {
                 startClient(args);
             else
                 System.out.println("Unknown mode: " + mode);
+
+
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    private static void hookCleanupThread() {
+        Runtime.getRuntime().addShutdownHook(new CleanupThread());
     }
 
     public static void startClient(String args[]) throws IOException {
@@ -50,19 +76,27 @@ public class Mesigi implements Listener {
                 "127.0.0.1", CmdUtil.getIntAttribute(args, "-port"));
         client.initialize();
         client.sendPacket(new MessageSendPacket(
-           new Message("", new User("test", UserStatus.ONLINE), "", new ArrayList<User>())));
+           new Message("1", new User("test", UserStatus.ONLINE), "2", new ArrayList<User>())));
     }
 
     public static void startServer(String args[]){
         Server server = new Server(CmdUtil.getIntAttribute(args, "-p", "-port"));
     }
 
-    public static void registerPackets()  {
-        Packet.registerPacket(MessageSendPacket.class);
-        Packet.registerPacket(AuthenticationPacket.class);
-        Packet.registerPacket(AuthenticationRequestPacket.class);
-        Packet.registerPacket(AuthenticationSecretPacket.class);
-        Packet.registerPacket(ConversationCreatePacket.class);
-        Packet.registerPacket(UserStateChangePacket.class);
+    public static void registerPackets(Class<? extends Packet>... classes)  {
+        for (Class<? extends Packet> clazz : classes)
+            Packet.registerPacket(clazz);
+    }
+
+    public static class CleanupThread extends Thread{
+        @Override
+        public void run(){
+            UpnpManager.cleanup();
+        }
+    }
+
+    @EventHandler
+    public void onRecieve(PacketRecievedEvent e){
+        ReflectionLogger.log(LogLevel.INFO, "Packet recieved: " + e.getPacket().getClass().getName());
     }
 }

@@ -27,7 +27,8 @@ public class ReflectionLogger {
     }
 
     public static void log(LogLevel level, String string){
-        String className = Thread.currentThread().getStackTrace()[Thread.currentThread().getStackTrace().length-1].getClassName();
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        String className = elements[elements.length-1].getClassName();
         if (classList != null && filterMode != null){
             boolean foundMatch = (filterMode == FilterMode.BLACKLIST);
             for (Class<?> clazz : classList)

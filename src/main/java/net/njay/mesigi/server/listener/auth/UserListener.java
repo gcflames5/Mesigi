@@ -1,9 +1,9 @@
 package net.njay.mesigi.server.listener.auth;
 
+import net.njay.customevents.event.EventHandler;
 import net.njay.mesigi.event.user.UserConnectEvent;
 import net.njay.mesigi.event.user.UserDisconnectEvent;
 import net.njay.mesigi.server.Server;
-import org.bukkit.event.EventHandler;
 
 /**
  * Created by Nick on 7/4/14.
