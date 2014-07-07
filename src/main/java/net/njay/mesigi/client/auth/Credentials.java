@@ -7,18 +7,16 @@ import net.njay.mesigi.util.secret.SecretGenerator;
  */
 public class Credentials {
 
-    private String username, password, uuid, secretKey;
+    private String username, password, secretKey;
 
-    public Credentials(String username, String password, String uuid){
+    public Credentials(String username, String password){
         this.username = username;
         this.password = password;
-        this.uuid = uuid;
         this.secretKey = SecretGenerator.generateSecret();
     }
 
     public String getUsername(){ return this.username; }
     public String getPassword(){ return this.password; }
-    public String getUuid(){ return this.uuid; }
     public String getSecretKey(){ return this.secretKey; }
 
 }

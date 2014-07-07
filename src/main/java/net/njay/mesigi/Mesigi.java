@@ -16,6 +16,7 @@ import net.njay.mesigi.packet.message.MessageSendPacket;
 import net.njay.mesigi.packet.user.UserStateChangePacket;
 import net.njay.mesigi.server.Server;
 import net.njay.mesigi.util.cmd.CmdUtil;
+import net.njay.mesigi.util.dbconn.DatabaseConnector;
 import net.njay.mesigi.util.log.LogLevel;
 import net.njay.mesigi.util.log.ReflectionLogger;
 import net.njay.mesigi.util.upnp.Upnp;
@@ -27,11 +28,14 @@ import net.njay.serverinterconnect.packet.Packet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by Nick on 7/3/14.
  */
 public class Mesigi implements Listener {
+
+    static Scanner scanner = new Scanner(System.in);
 
     public static void main(String args[]) {
         hookCleanupThread();
@@ -71,7 +75,11 @@ public class Mesigi implements Listener {
     }
 
     public static void startClient(String args[]) throws IOException {
-        Credentials cred = new Credentials("username", "password", "uuid");
+        System.out.print("Username: ");
+        String username = scanner.next();
+        System.out.print("Password: ");
+        String password = scanner.next();
+        Credentials cred = new Credentials(username, password);
         final Client client = new Client(new User("test", UserStatus.ONLINE), cred,
                 "127.0.0.1", CmdUtil.getIntAttribute(args, "-port"));
         client.initialize();

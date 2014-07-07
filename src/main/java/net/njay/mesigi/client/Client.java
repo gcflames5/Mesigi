@@ -5,6 +5,7 @@ import net.njay.mesigi.client.auth.Credentials;
 import net.njay.mesigi.client.listener.AuthenticationListener;
 import net.njay.mesigi.client.user.User;
 import net.njay.mesigi.packet.auth.AuthenticationSecretPacket;
+import net.njay.mesigi.util.dbconn.DatabaseConnector;
 import net.njay.mesigi.util.log.LogLevel;
 import net.njay.mesigi.util.log.ReflectionLogger;
 import net.njay.serverinterconnect.client.TcpClientManager;
@@ -20,10 +21,19 @@ public class Client {
     private Credentials credentials;
     private TcpClientManager tcpManager;
     private LinkedBlockingDeque<Packet> packetQueue;
+    private String sessionId;
 
     private boolean isInitialized;
 
-    public Client(User user, Credentials credentials, String ipToConnect, int listenPort){
+    public Client(User user, Credentials credentials, String ipToConnect, int listenPort) throws IOException {
+        System.out.print("Authenticating... ");
+        sessionId = DatabaseConnector.validate(credentials);
+        if (sessionId == null){
+            System.out.println(" failed! Exiting...");
+            System.exit(0);
+        }
+        System.out.println(" complete!");
+        System.out.println("Connecting to " + ipToConnect + ":" + listenPort + "...");
         this.user = user;
         this.credentials = credentials;
         tcpManager = new TcpClientManager(ipToConnect, listenPort);
@@ -62,5 +72,6 @@ public class Client {
     public void setInitialized(boolean initialized){ this.isInitialized = initialized; if (initialized) try { flushQueue(); } catch (InterruptedException e) { e.printStackTrace(); } }
     public boolean isInitialized(){ return this.isInitialized; }
 
+    public String getSessionId(){ return this.sessionId; }
 
 }

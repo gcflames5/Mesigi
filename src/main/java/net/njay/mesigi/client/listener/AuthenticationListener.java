@@ -24,7 +24,7 @@ public class AuthenticationListener implements Listener {
         if (!(e.getPacket() instanceof AuthenticationRequestPacket)) return;
         AuthenticationRequestPacket arPacket = (AuthenticationRequestPacket) e.getPacket();
         if (arPacket.getSecret().equals(client.getCredentials().getSecretKey())){
-            AuthenticationPacket authPacket = new AuthenticationPacket(client.getCredentials().getUsername(), client.getCredentials().getUuid());
+            AuthenticationPacket authPacket = new AuthenticationPacket(client.getCredentials().getUsername(), client.getSessionId());
             client.getTcpManager().getConnection().sendPacket(authPacket);
             client.setInitialized(true);
         }else{

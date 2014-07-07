@@ -14,6 +14,8 @@ import net.njay.mesigi.util.dbconn.DatabaseConnector;
 import net.njay.serverinterconnect.connection.TcpConnection;
 import net.njay.serverinterconnect.event.PacketRecievedEvent;
 
+import java.io.IOException;
+
 /**
  * Created by Nick on 7/4/14.
  */
@@ -29,7 +31,7 @@ public class AuthenticationListener implements Listener {
     }
 
     @EventHandler
-    public void onPacketRecieve(PacketRecievedEvent e){
+    public void onPacketRecieve(PacketRecievedEvent e) throws IOException {
         if (conn != e.getConnection()) return;
         if (e.getPacket() instanceof AuthenticationSecretPacket){
             AuthenticationSecretPacket secretPacket = (AuthenticationSecretPacket) e.getPacket();
@@ -37,7 +39,7 @@ public class AuthenticationListener implements Listener {
             e.getConnection().sendPacket(requestPacket);
         }else if (e.getPacket() instanceof AuthenticationPacket){
             AuthenticationPacket authenticationPacket = (AuthenticationPacket) e.getPacket();
-            if (DatabaseConnector.isValid(authenticationPacket)){
+            if (DatabaseConnector.validate(authenticationPacket)){
                 Event.callEvent(new UserConnectEvent(authenticationPacket.getSessionId(), new User(authenticationPacket.getUsername(), UserStatus.ONLINE)));
             }else{
                 server.terminateConnection(conn);
